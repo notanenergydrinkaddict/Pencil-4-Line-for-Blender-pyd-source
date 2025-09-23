@@ -1,3 +1,12 @@
+#if defined(_WIN32)
+#if !defined(_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
+// `std::mutex` here is different than the one shipped with Blender.
+// Blender may use its own `msvcp140.dll` and this causes incompatibility with newer toolset.
+// https://developercommunity.visualstudio.com/t/Access-violation-in-_Thrd_yield-after-up/10664660#T-N10668856
+#define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
+#endif // !defined(_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
+#endif // defined(_WIN32)
+
 #include <algorithm>
 #include <sstream>
 #include <mutex>
