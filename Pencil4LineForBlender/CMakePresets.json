@@ -1,0 +1,23 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "vs2022",
+            "description": "Target Windows with the Visual Studio development environment.",
+            "hidden": false,
+            "generator": "Visual Studio 17 2022",
+            "toolset": "ClangCL",
+            "installDir": "${sourceDir}/install",
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "windows-clang-x64"
+                }
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        }
+    ]
+}

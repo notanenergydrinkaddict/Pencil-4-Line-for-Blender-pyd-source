@@ -125,6 +125,8 @@
 #if !defined(__clang__)
 #define INSTRUCTION_REORDER_BARRIER _ReadWriteBarrier()
 #else
+#include <wmmintrin.h>
+#include <smmintrin.h>
 #endif
 #include <intrin.h>
 #else
