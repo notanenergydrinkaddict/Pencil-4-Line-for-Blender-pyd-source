@@ -10,6 +10,7 @@ if(MSVC OR XCODE)
     Debug_Python39 Release_Python39
     Debug_Python310 Release_Python310
     Debug_Python311 Release_Python311
+    Debug_Python311_450 Release_Python311_450
     CACHE STRING "Configurations" FORCE
   )
 endif()
@@ -128,21 +129,27 @@ endif()
 
 
 # よく使う値を変数に保存
-set(PythonVer $<IF:$<CONFIG:Debug_Python39,Release_Python39>,39,$<IF:$<CONFIG:Debug_Python310,Release_Python310>,310,311>>) # Pythonバージョン（ドット無し）
-set(PythonVerPoint $<IF:$<CONFIG:Debug_Python39,Release_Python39>,3.9,$<IF:$<CONFIG:Debug_Python310,Release_Python310>,3.10,3.11>>) # Pythonバージョン（ドット無し）
-set(IsDebug $<CONFIG:Debug_Python39,Debug_Python310,Debug_Python311>) # デバッグ構成かどうか　（TODO:プリセットの方で定義した方が取り回しが楽かもしれない）
+set(PythonVer
+  "$<$<CONFIG:Debug_Python39>:39>$<$<CONFIG:Release_Python39>:39>$<$<CONFIG:Debug_Python310>:310>$<$<CONFIG:Release_Python310>:310>$<$<CONFIG:Debug_Python311>:311>$<$<CONFIG:Release_Python311>:311>$<$<CONFIG:Debug_Python311_450>:311>$<$<CONFIG:Release_Python311_450>:311>"
+) # Pythonバージョン（ドット無し）
+set(PythonVerPoint
+  "$<$<CONFIG:Debug_Python39>:3.9>$<$<CONFIG:Release_Python39>:3.9>$<$<CONFIG:Debug_Python310>:3.10>$<$<CONFIG:Release_Python310>:3.10>$<$<CONFIG:Debug_Python311>:3.11>$<$<CONFIG:Release_Python311>:3.11>$<$<CONFIG:Debug_Python311_450>:3.11>$<$<CONFIG:Release_Python311_450>:3.11>"
+) # Pythonバージョン（ドット無し）
+set(IsDebug "$<OR:$<CONFIG:Debug_Python39>,$<CONFIG:Debug_Python310>,$<CONFIG:Debug_Python311>,$<CONFIG:Debug_Python311_450>>") # デバッグ構成かどうか　（TODO:プリセットの方で定義した方が取り回しが楽かもしれない）
 
+set(BlenderVerMin $<IF:$<CONFIG:Debug_Python311_450,Release_Python311_450>,_450,>)
 
 # 全般オプション
-set_property(TARGET Pencil4LineForBlender PROPERTY DEBUG_CONFIGURATIONS Debug_Python39,Debug_Python310,Debug_Python311) # どれがデバッグ構成なのかを指定
+set_property(TARGET Pencil4LineForBlender PROPERTY DEBUG_CONFIGURATIONS Debug_Python39,Debug_Python310,Debug_Python311,Debug_Python311_450) # どれがデバッグ構成なのかを指定
 set_target_properties(Pencil4LineForBlender PROPERTIES
   CXX_STANDARD 17
-  OUTPUT_NAME pencil4line_for_blender_${OsName}_${PythonVer}
+  OUTPUT_NAME pencil4line_for_blender_${OsName}_${PythonVer}${BlenderVerMin}
   PREFIX "" # デフォルトで「lib」が入っているので空にする
   SUFFIX ${Suffix}
   INTERPROCEDURAL_OPTIMIZATION_RELEASE_PYTHON39 TRUE # プログラム全体の最適化
   INTERPROCEDURAL_OPTIMIZATION_RELEASE_PYTHON310 TRUE
   INTERPROCEDURAL_OPTIMIZATION_RELEASE_PYTHON311 TRUE
+  INTERPROCEDURAL_OPTIMIZATION_RELEASE_PYTHON311_450 TRUE
 )
 
 
@@ -151,6 +158,7 @@ target_compile_definitions(Pencil4LineForBlender PRIVATE
   UNICODE _UNICODE
   $<$<BOOL:${WIN32}>:WIN32 _WINDOWS $<${IsDebug}:_DEBUG>>
   $<$<AND:$<NOT:$<BOOL:${WIN32}>>,${IsDebug}>:DEBUG=1>
+  $<$<OR:$<CONFIG:Debug_Python311_450>,$<CONFIG:Release_Python311_450>>:NEW_PROPERTY_RNA>
   PYTHON${PythonVer}
   PYBIND_INCLUDE PENCIL4LINEFORBLENDER_EXPORTS _USRDLL
 )
@@ -185,9 +193,11 @@ endif()
 set(CMAKE_SHARED_LINKER_FLAGS_DEBUG_PYTHON39 ${CMAKE_SHARED_LINKER_FLAGS_DEBUG})
 set(CMAKE_SHARED_LINKER_FLAGS_DEBUG_PYTHON310 ${CMAKE_SHARED_LINKER_FLAGS_DEBUG})
 set(CMAKE_SHARED_LINKER_FLAGS_DEBUG_PYTHON311 ${CMAKE_SHARED_LINKER_FLAGS_DEBUG})
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG_PYTHON311_450 ${CMAKE_SHARED_LINKER_FLAGS_DEBUG})
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE_PYTHON39 ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE_PYTHON310 ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE_PYTHON311 ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
+set(CMAKE_SHARED_LINKER_FLAGS_RELEASE_PYTHON311_450 ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
 if (${WIN32})
   target_link_directories(Pencil4LineForBlender PRIVATE $ENV{LOCALAPPDATA}/Programs/Python/Python${PythonVer}/libs)
   target_link_options(Pencil4LineForBlender PRIVATE
