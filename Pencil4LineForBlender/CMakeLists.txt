@@ -248,6 +248,14 @@ message("WIN32=${WIN32}")
 message("LINUX=${LINUX}")
 message("UNIX=${UNIX}")
 
+install(TARGETS Pencil4LineForBlender
+  RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/Package/bin
+  LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/Package/bin
+)
+
+install(FILES ${CMAKE_SOURCE_DIR}/commitHash.txt
+  DESTINATION ${CMAKE_SOURCE_DIR}/Package/bin
+)
 
 # TODO: VisualStudioソリューションエクスプローラ上での論理フォルダ構成を設定（ファイルシステム上とは別のフォルダ構成を作れる）
 # set_target_properties(MyLibrary PROPERTIES FOLDER "MyFolder")
