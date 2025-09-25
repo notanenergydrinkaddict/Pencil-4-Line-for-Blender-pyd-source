@@ -2,6 +2,30 @@
 # プロジェクト専用ロジックはこちらです。
 #
 
+cmake_minimum_required(VERSION 3.15)
+project(Pencil4LineForBlender)
+
+if(MSVC OR XCODE)
+  set(CMAKE_CONFIGURATION_TYPES
+    Debug_Python39 Release_Python39
+    Debug_Python310 Release_Python310
+    Debug_Python311 Release_Python311
+    CACHE STRING "Configurations" FORCE
+  )
+endif()
+
+if(WIN32)
+    set(Suffix ".pyd")
+    set(OsName "win64")
+elseif(APPLE)
+    set(Suffix ".so")
+    set(OsName "mac")
+elseif(UNIX)
+    set(Suffix ".so")
+    set(OsName "linux")
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
 
 # ソースをこのプロジェクトの実行可能ファイルに追加します。
 add_library (Pencil4LineForBlender SHARED
@@ -110,7 +134,7 @@ set(IsDebug $<CONFIG:Debug_Python39,Debug_Python310,Debug_Python311>) # デバ�
 
 
 # 全般オプション
-set_property(TARGET Pencil4LineForBlender PROPERTY DEBUG_CONFIGURATIONS Debug_Python39,Debug_Python310) # どれがデバッグ構成なのかを指定
+set_property(TARGET Pencil4LineForBlender PROPERTY DEBUG_CONFIGURATIONS Debug_Python39,Debug_Python310,Debug_Python311) # どれがデバッグ構成なのかを指定
 set_target_properties(Pencil4LineForBlender PROPERTIES
   CXX_STANDARD 17
   OUTPUT_NAME pencil4line_for_blender_${OsName}_${PythonVer}
@@ -131,13 +155,13 @@ target_compile_definitions(Pencil4LineForBlender PRIVATE
   PYBIND_INCLUDE PENCIL4LINEFORBLENDER_EXPORTS _USRDLL
 )
 target_include_directories(Pencil4LineForBlender PRIVATE
-  ${CMAKE_SOURCE_DIR}/pybind11/include
-  ${CMAKE_SOURCE_DIR}/cereal/include
+  ${CMAKE_SOURCE_DIR}/../pybind11/include
+  ${CMAKE_SOURCE_DIR}/../cereal/include
   $<$<BOOL:${WIN32}>:$ENV{LOCALAPPDATA}/Programs/Python/Python${PythonVer}/include>
   $<$<NOT:$<BOOL:${WIN32}>>:/usr/include/python${PythonVerPoint}>
-  ${CMAKE_SOURCE_DIR}/blender/makesdna
-  ${CMAKE_SOURCE_DIR}/blender/makesrna
-  ${CMAKE_SOURCE_DIR}/blender/python
+  ${CMAKE_SOURCE_DIR}/../blender/makesdna
+  ${CMAKE_SOURCE_DIR}/../blender/makesrna
+  ${CMAKE_SOURCE_DIR}/../blender/python
   ${CMAKE_SOURCE_DIR}/Pencil4LineForBlender
 )
 if (${WIN32})
@@ -200,9 +224,9 @@ endif()
 # ビルド後の処理
 # ビルド結果をPackageフォルダにコピー
 # CMAKEコマンドラインのコピー機能を使うことによって各プラットフォームで動作する
-add_custom_command(TARGET Pencil4LineForBlender POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Pencil4LineForBlender> ${CMAKE_SOURCE_DIR}/Package/bin
-)
+# add_custom_command(TARGET Pencil4LineForBlender POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Pencil4LineForBlender> ${CMAKE_SOURCE_DIR}/Package/bin
+# )
 
 message("CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 message("CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME}")
