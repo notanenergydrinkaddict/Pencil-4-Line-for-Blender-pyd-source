@@ -396,6 +396,7 @@ xcuserdata/
 *.xccheckout
 
 #CMAKE
+build/
 out/
 
 Deploy/
